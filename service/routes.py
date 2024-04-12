@@ -108,6 +108,15 @@ def update_account(identification):
 ######################################################################
 
 # ... place you code here to DELETE an account ...
+@app.route("/accounts/<identification>", methods=["DELETE"])
+def delete_account(identification):
+    account = Account.find(identification)
+    location_url = "/accounts/"+f'{identification}'
+    if account:
+        account.delete()
+    return make_response(
+        jsonify(""), status.HTTP_204_NO_CONTENT, {"Location": location_url})
+
 
 
 ######################################################################
