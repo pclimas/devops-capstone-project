@@ -89,6 +89,18 @@ def read_account(identification):
 ######################################################################
 
 # ... place you code here to UPDATE an account ...
+@app.route("/accounts/<identification>", methods=["PUT"])
+def update_account(identification):
+    result = Account.find(identification)
+    if result:
+        updated_account = result.deserialize(request.get_json())
+        updated_account.update()
+        message = updated_account.serialize()
+        location_url = "/accounts/"+f'{message["id"]}'
+        return make_response(
+        jsonify(message), status.HTTP_200_OK, {"Location": location_url})
+
+    return make_response(jsonify(None),status.HTTP_404_NOT_FOUND)
 
 
 ######################################################################
