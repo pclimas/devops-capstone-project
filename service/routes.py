@@ -61,7 +61,7 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     result = Account.all()
@@ -72,7 +72,7 @@ def list_accounts():
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
+
 @app.route("/accounts/<identification>", methods=["GET"])
 def read_account(identification):
     result = Account.find(identification)
@@ -80,15 +80,15 @@ def read_account(identification):
         message = result.serialize()
         location_url = "/accounts/"+f'{message["id"]}'
         return make_response(
-        jsonify(message), status.HTTP_200_OK, {"Location": location_url})
-    return make_response(jsonify(None),status.HTTP_404_NOT_FOUND)
+            jsonify(message), status.HTTP_200_OK, {"Location": location_url})
+    return make_response(jsonify(None), status.HTTP_404_NOT_FOUND)
 
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
+
 @app.route("/accounts/<identification>", methods=["PUT"])
 def update_account(identification):
     result = Account.find(identification)
@@ -98,16 +98,16 @@ def update_account(identification):
         message = updated_account.serialize()
         location_url = "/accounts/"+f'{message["id"]}'
         return make_response(
-        jsonify(message), status.HTTP_200_OK, {"Location": location_url})
+            jsonify(message), status.HTTP_200_OK, {"Location": location_url})
 
-    return make_response(jsonify(None),status.HTTP_404_NOT_FOUND)
+    return make_response(jsonify(None), status.HTTP_404_NOT_FOUND)
 
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
+
 @app.route("/accounts/<identification>", methods=["DELETE"])
 def delete_account(identification):
     account = Account.find(identification)
@@ -116,8 +116,6 @@ def delete_account(identification):
         account.delete()
     return make_response(
         jsonify(""), status.HTTP_204_NO_CONTENT, {"Location": location_url})
-
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
