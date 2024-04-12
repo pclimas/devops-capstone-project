@@ -149,3 +149,32 @@ class TestAccountService(TestCase):
         non_existing_id = 0
         response = self.client.get(BASE_URL+f'/{non_existing_id}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_accounts(self):
+        """It should result in a 200 OK and a retrieval of all accounts"""
+
+        # tests if [] is returned since no accounts should exist
+        response = self.client.get(BASE_URL)
+        message = response.get_json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(message, [])
+        
+        # creates N [1-10] accounts 
+        import random
+        n_accounts = random.randint(1,10)
+        accounts = [AccountFactory() for x in range(n_accounts)]
+        for _,account in enumerate(accounts):
+            response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # tests if the service returns N accounts
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        message = response.get_json()
+        self.assertEqual(len(message), n_accounts)
+        
+
