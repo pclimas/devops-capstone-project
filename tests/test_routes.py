@@ -213,4 +213,45 @@ class TestAccountService(TestCase):
         self.assertEqual(response_account["name"], name)
         self.assertEqual(response_account["address"], address)
 
+    def test_delete_account(self):
+        """It should result in 204 no content upon account deletion"""
+        
+        # create a new account
+        account = AccountFactory()
+        
+        # attempt to delete it on the remote service
+        response = self.client.delete(
+            BASE_URL+f'/{account.id}',
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # check the account does not exist
+        new_response = self.client.get(BASE_URL+f'/{account.id}')
+        self.assertEqual(new_response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # create the account remotely        
+        response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        import json
+        response = self.client.delete(
+            BASE_URL+f'/{account.id}',
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # check again the account does not exist
+        new_response = self.client.get(BASE_URL+f'/{account.id}')
+        self.assertEqual(new_response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+
+
 
