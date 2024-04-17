@@ -12,12 +12,14 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+from service import talisman
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
 BASE_URL = "/accounts"
+HTTPS_ENVIRON = {'wsgi.url_scheme':'https'}
 
 
 ######################################################################
@@ -34,6 +36,7 @@ class TestAccountService(TestCase):
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         init_db(app)
+        talisman.force_https = False
 
     @classmethod
     def tearDownClass(cls):
@@ -73,6 +76,22 @@ class TestAccountService(TestCase):
     ######################################################################
     #  A C C O U N T   T E S T   C A S E S
     ######################################################################
+
+    def test_index_environ(self, environ_overrides=HTTPS_ENVIRON):
+        """It should return specified security headers"""
+        headers = {
+            'X-Frame-Options': 'SAMEORIGIN',
+            'X-Content-Type-Options': 'nosniff',
+            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Referrer-Policy': 'strict-origin-when-cross-origin'
+        }
+        response = self.client.get("/")
+        logging.debug(response.__dict__)
+        for i in headers:
+            r = response.headers.get(i)
+            self.assertIsNotNone(r)
+            self.assertEqual(headers[i], r)
+
 
     def test_index(self):
         """It should get 200_OK from the Home Page"""
