@@ -77,6 +77,16 @@ class TestAccountService(TestCase):
     #  A C C O U N T   T E S T   C A S E S
     ######################################################################
 
+    def test_index_cors(self, environ_overrides=HTTPS_ENVIRON):
+        """It should return a reply with CORS headers"""
+        cors = {"Access-Control-Allow-Origin": "*"}
+        response = self.client.get("/")
+        logging.debug(response.__dict__)
+        for i in cors:
+            r = response.headers.get(i)
+            self.assertIsNotNone(r)
+            self.assertEqual(cors[i], r)  
+
     def test_index_environ(self, environ_overrides=HTTPS_ENVIRON):
         """It should return specified security headers"""
         headers = {
