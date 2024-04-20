@@ -19,7 +19,7 @@ DATABASE_URI = os.getenv(
 )
 
 BASE_URL = "/accounts"
-HTTPS_ENVIRON = {'wsgi.url_scheme':'https'}
+HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 
 
 ######################################################################
@@ -85,7 +85,7 @@ class TestAccountService(TestCase):
         for i in cors:
             r = response.headers.get(i)
             self.assertIsNotNone(r)
-            self.assertEqual(cors[i], r)  
+            self.assertEqual(cors[i], r)
 
     def test_index_environ(self, environ_overrides=HTTPS_ENVIRON):
         """It should return specified security headers"""
@@ -101,7 +101,6 @@ class TestAccountService(TestCase):
             r = response.headers.get(i)
             self.assertIsNotNone(r)
             self.assertEqual(headers[i], r)
-
 
     def test_index(self):
         """It should get 200_OK from the Home Page"""
@@ -163,15 +162,15 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         # obtain the new account
         new_account = response.get_json()
         new_response = self.client.get(BASE_URL+f'/{new_account["id"]}')
         self.assertEqual(new_response.status_code, status.HTTP_200_OK)
 
-        # check response data from account creation is equal to 
+        # check response data from account creation is equal to
         # it's read content
-        self.assertEqual(new_response.get_json(),response.get_json())
+        self.assertEqual(new_response.get_json(), response.get_json())
 
     def test_account_not_found(self):
         """It should result in an 404 not found on account read"""
@@ -187,17 +186,17 @@ class TestAccountService(TestCase):
         message = response.get_json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(message, [])
-        
-        # creates N [1-10] accounts 
+
+        # creates N [1-10] accounts
         import random
-        n_accounts = random.randint(1,10)
+        n_accounts = random.randint(1, 10)
         accounts = [AccountFactory() for x in range(n_accounts)]
-        for _,account in enumerate(accounts):
+        for _, account in enumerate(accounts):
             response = self.client.post(
-            BASE_URL,
-            json=account.serialize(),
-            content_type="application/json"
-        )
+                BASE_URL,
+                json=account.serialize(),
+                content_type="application/json"
+            )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # tests if the service returns N accounts
@@ -205,7 +204,7 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message = response.get_json()
         self.assertEqual(len(message), n_accounts)
-        
+
     def test_updates_existing_account(self):
         """It should result in 200 ok and account data should be updated"""
 
@@ -227,7 +226,6 @@ class TestAccountService(TestCase):
         name = 'MR random'
         address = 'rand Random BLV'
 
-        import copy
         original_account = response.get_json()
         new_account = original_account.copy()
         new_account['name'] = name
@@ -244,10 +242,10 @@ class TestAccountService(TestCase):
 
     def test_delete_account(self):
         """It should result in 204 no content upon account deletion"""
-        
+
         # create a new account
         account = AccountFactory()
-        
+
         # attempt to delete it on the remote service
         response = self.client.delete(
             BASE_URL+f'/{account.id}',
@@ -260,7 +258,7 @@ class TestAccountService(TestCase):
         new_response = self.client.get(BASE_URL+f'/{account.id}')
         self.assertEqual(new_response.status_code, status.HTTP_404_NOT_FOUND)
 
-        # create the account remotely        
+        # create the account remotely
         response = self.client.post(
             BASE_URL,
             json=account.serialize(),
@@ -268,7 +266,6 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        import json
         response = self.client.delete(
             BASE_URL+f'/{account.id}',
             json=account.serialize(),
@@ -279,8 +276,3 @@ class TestAccountService(TestCase):
         # check again the account does not exist
         new_response = self.client.get(BASE_URL+f'/{account.id}')
         self.assertEqual(new_response.status_code, status.HTTP_404_NOT_FOUND)
-
-
-
-
-
